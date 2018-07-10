@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="col-md-8 mx-8">
+{% if user.is_authenticated %}
+    <div class="card mb-12 my-4">
+        <div class="card-header">
+            {{ label }}
+        </div> 
+        <div class="card-body">
+            <form action="{% url 'blogs:save' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="title"></label>
+                <input type="hidden" name="blog_id" value="{{ blog.id }}">
+                <input id="title" class="form-control" type="text" name="title" placeholder="Title" value="{{ blog.title }}">
+                <small id="title-validation" class="text-danger">{{ errors.title }}</small>
+
+                <select name="selected_category" class="form-control my-4" placeholder="Category">
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" >{{ category.name }}</option>
+                    {% endfor %}
+                </select>                
+                <small id="category-validation" class="text-danger">{{ errors.selected_category }}</small>
+
+                <label for="content" class="my-2"></label>
+                <textarea id="content" class="form-control" type="text" name="content" rows="5" placeholder="Content">{{ blog.content }}</textarea>
+                <small id="content-validation" class="text-danger">{{ errors.content }}</small>
+
+                <input type="file" class="form-control-file mb-0 my-4" name="cover_image">
+                <small id="cover_image-validation" class="text-danger">{{ errors.cover_image }}</small>
+
+                <button class="btn btn-default btn-primary btn-block my-3 " type="submit">Save</button>
+            </form>
+        </div>
+    </div>
+{% endif %}
+</div>
+{% endblock %}

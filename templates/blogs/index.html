@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% block content%}
+<div class="col-md-8 my-4">
+    <h1>Latest Blogs</h1>
+
+    {% if blog_list %}
+    {% for blog in blog_list %}
+    <div class="card mb-4">
+        <img class="card-img-top" src="{{ blog.cover_image.url }}" alt="Cover image">
+        <div class="card-body">
+            <a href="{% url 'blogs:view' blog.id %}">
+                <h2 class="card-title mb-0">{{ blog.title }} | <span class="text-primary">{{ blog.category.name }}</span></h2>
+            </a>
+            <small class="ml-2">by {{ blog.owner }}</small>
+            <p class="card-text my-4 ml-3">{{ blog.content }}</p>
+        </div>
+        <div class="card-footer"> Published on {{ blog.date_added | date:"F d, Y" }}</div>
+    </div>
+    {% endfor %}
+    {% else %}
+    <h1 class="my-4">No blogs available.</h1>
+    {% endif %}
+</div>
+<div class="col-md-4">
+{% if not user.is_authenticated %}
+    <div class="card mb-12 my-4">
+        <div class="card-header">
+            REGISTER HERE
+        </div>
+        <div class="card-body">
+
+            <form action="{% url 'blogs:register' %}" method="POST">
+                {% csrf_token %}
+                <label for="email"></label>
+                <input id="email" class="form-control" type="email" name="email" placeholder="Email">
+                <small id="email-validation" class="text-danger">{{ errors.email }}</small>
+
+                <label for="username"></label>
+                <input id="username" class="form-control" type="text" name="username" placeholder="Username">
+                <small id="username-validation" class="text-danger">{{ errors.username }}</small>
+
+                <label for="password"></label>
+                <input id="password" class="form-control" type="password" name="password" placeholder="Password">
+                <small id="password-validation" class="text-danger">{{ errors.password }}</small>
+
+                <label for="confirm-password"></label>
+                <input id="confirm_password" class="form-control" type="password" name="confirm_password" placeholder="Confirm password">
+                <small id="con-password-validation" class="text-danger">{{ errors.confirm_password }}</small>
+                
+                <button class="btn btn-default btn-primary btn-block my-3 " type="submit">Sign-up</button>
+            </form>
+        </div>
+    </div>
+{% else %}
+    <div class="card mb-12 my-4">
+        <div class="card-header">
+            MY BLOGS
+            <a href="{% url 'blogs:add' %}" id="add-blog" class="btn btn-sm btn-primary float-right">
+                Add<span class="glyphicon glyphicon-plus"></span>
+            </a>
+        </div>
+        <div class="card-body no-padding">
+            {% if my_blog_list %}
+            <ul class="list-group">
+            {% for blog in my_blog_list %}
+                <li class="list-group-item">
+                    {{ blog.title | slice:":20"}}...
+                    <div class="float-right">
+                        <a href="{% url 'blogs:edit' blog.id %}">Edit</a> |
+                        <a id="delete-blog" class="a" href="#" onclick="confirm_delete({{ blog.id }})">Delete</a>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+            {% else %}
+            <p>You have no blogs yet.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            CATEGORIES
+        </div>
+        <div class="card-body">
+            {% for category in categories %}
+            <a href="{% url 'blogs:category' category.id %}">{{ category.name }}</a>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
+</div>
+<div id="delete-modal" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="delete" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="my-label">Delete blog</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Do you really want to delete this blog?</p>
+      </div>
+      <div class="modal-footer">
+        <a id="confirm-delete" href="#" class="btn btn-primary">Yes</a>
+        <a href="#" class="btn btn-secondary" data-dismiss="modal">No</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<script type="text/javascript">
+    var id = 0;
+    function confirm_delete(id){
+        id = id;
+        console.log(id);
+        console.log($("#confirm-delete").attr('href','/delete/'+id));
+        $("#delete-modal").modal('show');
+    }
+
+    // $("a").click(function(){
+    //     var url_to_delete = ($(this).attr('href'));
+    //     $("#confirm-delete").attr('href',url_to_delete);
+    //     console.log($("#confirm-delete").attr('href',url_to_delete));
+
+    // });
+
+</script>
+
+{% endblock %}

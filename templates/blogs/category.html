@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+
+{% if user.is_authenticated %}
+    
+<div class="col-md-4 my-4">
+    <div class="card">
+        <div class="card-header">
+            CATEGORIES | {{ category_info.name }}
+        </div>
+        <div class="card-body">
+        {% for category in category_list %}
+            <a href="{% url 'blogs:category' category.id %}">{{ category.name }}</a>
+        {% endfor %}
+        </div>
+    </div>
+</div>
+<div class="col-md-8 my-4">
+{% for blog in blog_list %}
+    <div class="card">
+        <img class="card-img-top" src="{{ blog.cover_image.url }}" alt="Cover image">
+        <div class="card-body">
+            <a href="{% url 'blogs:view' blog.id %}">
+                <h2 class="card-title mb-0">{{ blog.title }} | <span class="text-primary">{{ blog.category.name }}</span></h2>
+            </a>
+            <small class="ml-2">by {{ blog.owner }}</small>
+            <p class="card-text my-4 ml-3">{{ blog.content }}</p>
+        </div>
+        <div class="card-footer"> Published on {{ blog.date_added | date:"F d, Y" }}</div>
+
+    </div>
+{% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
