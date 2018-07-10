@@ -10,9 +10,6 @@ from .models import Blog,Category
 class UserRegistrationForm(forms.ModelForm):
     """ User registration form """
 
-    # username = forms.CharField()
-    # email = forms.EmailField()
-    # password = forms.CharField()
     confirm_password = forms.CharField()
     
 
@@ -72,11 +69,9 @@ class LoginForm(forms.ModelForm):
 class BlogForm(forms.ModelForm):
     """ Blog Form """
 
-    title   = forms.CharField(required=True)
-    content = forms.CharField(required=True)
     selected_category = forms.IntegerField(required=True)
-    blog_id = forms.IntegerField(required=False)
-    cover_image = forms.FileField(required=True)
+    title = forms.CharField(required=True, widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder' : 'Title'}))
+    content = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': 'form-control mb-4', 'placeholder': 'Content'}))
 
     class Meta:
         model= Blog
@@ -94,25 +89,9 @@ class BlogForm(forms.ModelForm):
             except Category.DoesNotExist:
                 category_id = None
 
-            """ Check if blog_id is > 0 """
-            existing_blog_id = self.cleaned_data.get('blog_id')
-            if existing_blog_id:
-                try :
-                    edit_blog = get_object_or_404(Blog,pk=existing_blog_id)
-                    edit_blog.owner = user
-                    edit_blog.category = category_id
-                    edit_blog.title = instance.title
-                    edit_blog.content = instance.content
-                    edit_blog.cover_image = instance.cover_image
-                    edit_blog.date_updated = datetime.datetime.now()
-                    edit_blog.save()
-
-                except Blog.DoesNotExist:
-                    return
-            else:
-                instance.owner = user
-                instance.category = category_id 
-                instance.save()
+            instance.owner = user
+            instance.category = category_id 
+            instance.save()
         return
 
     def build_errors(self,form):

@@ -39,7 +39,11 @@ class RegistrationView(TemplateView):
             user = form.save()
             user = authenticate(username = form.cleaned_data.get('username'), password=form.cleaned_data.get('password'))
             login(self.request, user)
-            return render(self.request, self.template_name, {})
+
+            blog_list = Blog.objects.all().order_by('-date_added')
+            categories = Category.objects.all()
+
+            return render(self.request, self.template_name, { 'blog_list' : blog_list, 'categories' : categories })
         else:
             errors= {}            
             for error in form.errors:
@@ -79,17 +83,35 @@ class LoginView(TemplateView):
         return HttpResponseRedirect(reverse('blogs:index'))
 
 
-class AddView(LoginRequiredMixin,TemplateView):
+class AddBlogView(LoginRequiredMixin,TemplateView):
 
-    template_name = 'blogs/add.html'
+    template_name = 'blogs/form.html'
 
     def get(self, *args, **kwargs):
+        form = BlogForm(self.request.GET or None)
         categories = Category.objects.all().order_by('name')
 
-        return render(self.request,self.template_name,{'label': 'ADD BLOG','categories' : categories })
+        return render(self.request,self.template_name,{
+            'form' : form,
+            'categories' : categories, 
+            'label': 'ADD BLOG',
+        })
 
     def post(self, *args,**kwargs):
-        return render(self.request,self.template_name,{})
+        form = BlogForm(self.request.POST, self.request.FILES)
+
+        if form.is_valid():
+
+            form.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
+            return HttpResponseRedirect(reverse('blogs:index'))
+        
+        else:
+            categories = Category.objects.all().order_by('name')
+            return render(self.request,self.template_name,{
+                'form':form,
+                'categories' : categories,
+                'label' : "ADD BLOG",
+            })
 
 
 class LogoutView(View):
@@ -106,38 +128,54 @@ class SaveBlogView(TemplateView):
     def get(self, *args, **kwargs):
         return HttpResponseRedirect(reverse('blogs:index'))
     def post(self,*args,**kwargs):
-        form_data = BlogForm(self.request.POST, self.request.FILES)
+        form = BlogForm(self.request.POST, self.request.FILES)
 
-        if form_data.is_valid():
+        if form.is_valid():
 
-            form_data.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
+            form.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
             return HttpResponseRedirect(reverse('blogs:index'))
         
         else:
             label = "ADD BLOG"
             if kwargs.get('pk'):
                 label = "EDIT BLOG"
-            errors = form_data.build_errors(form_data)
+            errors = form.build_errors(form)
             categories = Category.objects.all().order_by('name')
             return render(self.request,self.template_name,{
                 'errors' : errors,
                 'categories' : categories,
-                'blog': form_data.cleaned_data,
-                'label' : label
+                'label' : label,
             })
 
 
-class EditView(LoginRequiredMixin,TemplateView):
-    template_name = 'blogs/add.html'
+class EditBlogView(LoginRequiredMixin,TemplateView):
+    template_name = 'blogs/form.html'
 
     def  get(self,*args,**kwargs):
+
+        blog = get_object_or_404(Blog,pk=self.kwargs.get('pk'))
+        form = BlogForm(self.request.GET or None, instance=blog)
         categories = Category.objects.all().order_by('name')
-        blog = Blog.objects.get(pk=self.kwargs.get('pk'))
-        return render(self.request,self.template_name,{
-            'label' : 'EDIT BLOG',
-            'categories' : categories,
-            'blog' : blog
-        })
+        
+        return render(self.request,self.template_name,{'form':form,'categories' : categories,'label' : 'EDIT BLOG'})
+
+    def post(self,*args,**kwargs):
+
+        blog = get_object_or_404(Blog,pk=self.kwargs.get('pk'))
+        form = BlogForm(self.request.POST, self.request.FILES, instance=blog)
+
+        if form.is_valid():
+
+            form.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
+            return HttpResponseRedirect(reverse('blogs:index'))
+        
+        else:
+            categories = Category.objects.all().order_by('name')
+            return render(self.request,self.template_name,{
+                'form' : form,
+                'categories' : categories,
+                'label' : "EDIT BLOG"
+            })
 
 
 class BlogView(TemplateView):

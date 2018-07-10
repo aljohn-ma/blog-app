@@ -19,7 +19,7 @@
                     {% for category in categories %}
                         <option value="{{ category.id }}" >{{ category.name }}</option>
                     {% endfor %}
-                </select>                
+                </select>
                 <small id="category-validation" class="text-danger">{{ errors.selected_category }}</small>
 
                 <label for="content" class="my-2"></label>
