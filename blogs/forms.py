@@ -11,7 +11,6 @@ class UserRegistrationForm(forms.ModelForm):
     """ User registration form """
 
     confirm_password = forms.CharField()
-    
 
     class Meta:
         model = User
@@ -46,8 +45,8 @@ class UserRegistrationForm(forms.ModelForm):
 
 class LoginForm(forms.ModelForm):
     """ Login view form. """
-    username = forms.CharField()
-    password = forms.CharField()
+    username = forms.CharField(required=True)
+    password = forms.CharField(required=True)
 
     class Meta:
         model=User
@@ -72,14 +71,14 @@ class BlogForm(forms.ModelForm):
     selected_category = forms.IntegerField(required=True)
     title = forms.CharField(required=True, widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder' : 'Title'}))
     content = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': 'form-control mb-4', 'placeholder': 'Content'}))
-
+    
     class Meta:
         model= Blog
         fields =('title','content','cover_image')
 
     def save(self,**kwargs):
         """ Save blog """
-        user = kwargs.get('user')
+        
         commit = kwargs.get('commit')
         instance = super(BlogForm,self).save(commit=False)
         if commit:
@@ -89,7 +88,6 @@ class BlogForm(forms.ModelForm):
             except Category.DoesNotExist:
                 category_id = None
 
-            instance.owner = user
             instance.category = category_id 
             instance.save()
         return

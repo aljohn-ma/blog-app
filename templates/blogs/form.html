@@ -13,17 +13,18 @@
             {{ form.title }}
             <small id="title-validation" class="text-danger">{{ form.title.errors.as_text }}</small>
             
-           <select name="selected_category" class="form-control my-4" placeholder="Category">
+            <select name="selected_category" class="form-control my-4" placeholder="Category">
                 {% for category in categories %}
                     <option value="{{ category.id }}" >{{ category.name }}</option>
                 {% endfor %}
-            </select>  
+            </select>
+            <small id="category-validation" class="text-danger">{{ form.selected_category.errors }}</small>
             
             {{ form.content }}
-            <small id="content-validation" class="text-danger">{{ form.title.errors.content }}</small>
+            <small id="content-validation" class="text-danger">{{ form.content.errors}}</small>
             
             {{ form.cover_image }}
-            <small id="cover_image-validation" class="text-danger">{{ form.title.errors.cover_image }}</small>
+            <small id="cover_image-validation" class="text-danger">{{ form.cover_image.errors. }}</small>
 
             <button class="btn btn-default btn-primary btn-block my-4 " type="submit">Save</button>            
         </form>

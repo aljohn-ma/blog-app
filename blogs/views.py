@@ -156,7 +156,7 @@ class EditBlogView(LoginRequiredMixin,TemplateView):
         blog = get_object_or_404(Blog,pk=self.kwargs.get('pk'))
         form = BlogForm(self.request.GET or None, instance=blog)
         categories = Category.objects.all().order_by('name')
-        
+
         return render(self.request,self.template_name,{'form':form,'categories' : categories,'label' : 'EDIT BLOG'})
 
     def post(self,*args,**kwargs):
@@ -166,7 +166,7 @@ class EditBlogView(LoginRequiredMixin,TemplateView):
 
         if form.is_valid():
 
-            form.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
+            form.save(pk=kwargs.get('pk'),commit=True)
             return HttpResponseRedirect(reverse('blogs:index'))
         
         else:
