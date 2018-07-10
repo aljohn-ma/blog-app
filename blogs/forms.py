@@ -78,7 +78,7 @@ class BlogForm(forms.ModelForm):
 
     def save(self,**kwargs):
         """ Save blog """
-        
+        user = kwargs.get('user')
         commit = kwargs.get('commit')
         instance = super(BlogForm,self).save(commit=False)
         if commit:
@@ -88,6 +88,7 @@ class BlogForm(forms.ModelForm):
             except Category.DoesNotExist:
                 category_id = None
 
+            instance.owner = user
             instance.category = category_id 
             instance.save()
         return

@@ -166,7 +166,7 @@ class EditBlogView(LoginRequiredMixin,TemplateView):
 
         if form.is_valid():
 
-            form.save(pk=kwargs.get('pk'),commit=True)
+            form.save(user=self.request.user,pk=kwargs.get('pk'),commit=True)
             return HttpResponseRedirect(reverse('blogs:index'))
         
         else:
