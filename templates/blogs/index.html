@@ -14,7 +14,12 @@
             <small class="ml-2">by {{ blog.owner }}</small>
             <p class="card-text my-4 ml-3">{{ blog.content }}</p>
         </div>
-        <div class="card-footer"> Published on {{ blog.date_added | date:"F d, Y" }}</div>
+        <div class="card-footer"> 
+        Published on {{ blog.date_added | date:"F d, Y" }} 
+        {% if user == blog.owner %}
+        | <a href="{% url 'blogs:edit' blog.id %}">Edit</a>
+        {% endif %}
+        </div>
     </div>
     {% endfor %}
     {% else %}
@@ -29,7 +34,7 @@
         </div>
         <div class="card-body">
 
-            <form action="{% url 'blogs:register' %}" method="POST">
+            <form method="POST">
                 {% csrf_token %}
                 <label for="email"></label>
                 <input id="email" class="form-control" type="email" name="email" placeholder="Email">
@@ -117,17 +122,9 @@
     function confirm_delete(id){
         id = id;
         console.log(id);
-        console.log($("#confirm-delete").attr('href','/delete/'+id));
+        console.log($("#confirm-delete").attr('href','blogs/delete/'+id));
         $("#delete-modal").modal('show');
     }
-
-    // $("a").click(function(){
-    //     var url_to_delete = ($(this).attr('href'));
-    //     $("#confirm-delete").attr('href',url_to_delete);
-    //     console.log($("#confirm-delete").attr('href',url_to_delete));
-
-    // });
-
 </script>
 
 {% endblock %}

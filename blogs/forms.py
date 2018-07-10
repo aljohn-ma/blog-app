@@ -68,36 +68,17 @@ class LoginForm(forms.ModelForm):
 class BlogForm(forms.ModelForm):
     """ Blog Form """
 
-    selected_category = forms.IntegerField(required=True)
     title = forms.CharField(required=True, widget=forms.TextInput(attrs={'class' : 'form-control', 'placeholder' : 'Title'}))
     content = forms.CharField(required=True, widget=forms.Textarea(attrs={'class': 'form-control mb-4', 'placeholder': 'Content'}))
-    
+    category = forms.ModelChoiceField(queryset = Category.objects.all(),widget=forms.Select(attrs={'class' : 'form-control my-4'}))
     class Meta:
         model= Blog
-        fields =('title','content','cover_image')
+        fields =('title','content','cover_image','category')
 
-    def save(self,**kwargs):
-        """ Save blog """
-        user = kwargs.get('user')
-        commit = kwargs.get('commit')
+    def save(self,user,commit=True):
+
         instance = super(BlogForm,self).save(commit=False)
         if commit:
-            try:
-                category_id = Category.objects.get(pk=self.cleaned_data.get('selected_category'))
-
-            except Category.DoesNotExist:
-                category_id = None
-
             instance.owner = user
-            instance.category = category_id 
             instance.save()
         return
-
-    def build_errors(self,form):
-        errors= {}        
-        for error in form.errors:
-            errors[error] = form.errors[error]
-        
-        return errors
-
-
