@@ -12,7 +12,7 @@ class UserRegistrationForm(forms.Form):
     email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control','placeholder':'Email'}))
     username = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control mt-4','placeholder':'Username'}))
     password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control mt-4','placeholder':'Password'}))
-    confirm_password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control mt-4','placeholder':'Password'}))
+    confirm_password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control mt-4','placeholder':'Confirm password'}))
 
     def clean_confirm_password(self):
         """ Validate if password is equal to confir_password
@@ -21,15 +21,26 @@ class UserRegistrationForm(forms.Form):
         confirm_password = self.cleaned_data.get('confirm_password')
         if password != confirm_password:
             raise forms.ValidationError('Password did not match.')
+
         return confirm_password
+
 
     def clean_email(self):
         email = self.cleaned_data.get('email')
 
         if email and User.objects.filter(email=email).exists():
-            raise forms.ValidationError('Email is already taken')
+            raise forms.ValidationError('Email is already taken.')
 
         return email
+
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if username and User.objects.filter(username=username).exists():
+            raise forms.ValidationError('Username already exists.')
+
+        return  username
+        
 
     def save(self):
         user = User()

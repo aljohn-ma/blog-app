@@ -83,7 +83,7 @@ class AddBlogView(LoginRequiredMixin,TemplateView):
 
     def get(self, *args, **kwargs):
         form = BlogForm(self.request.GET or None)
-        form.owner = self.request.user.id
+        form.owner = self.request.user
         categories = Category.objects.all().order_by('name')
 
         return render(self.request,self.template_name,{
