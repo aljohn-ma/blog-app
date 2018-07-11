@@ -15,7 +15,7 @@
             <p class="card-text my-4 ml-3">{{ blog.content }}</p>
         </div>
         <div class="card-footer"> 
-        Published on {{ blog.date_added | date:"F d, Y" }} 
+            Published on {{ blog.date_added | date:"F d, Y" }} 
         {% if user == blog.owner %}
         | <a href="{% url 'blogs:edit' blog.id %}">Edit</a>
         {% endif %}

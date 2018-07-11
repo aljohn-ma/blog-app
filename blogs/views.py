@@ -13,16 +13,17 @@ class IndexView(TemplateView):
     """ Registration and index page
     """
     template_name = 'blogs/index.html'
-    blog_list = Blog.objects.all().order_by('-date_added')
+    
     categories = Category.objects.all()
 
     def get(self, *args, **kwargs):
         my_blog_list = {}
+        blog_list = Blog.objects.all().order_by('-date_added')
         if self.request.user.is_authenticated:
             my_blog_list = Blog.objects.filter(owner=self.request.user).order_by('-date_added')
         categories = Category.objects.all().order_by('name')
         return render(self.request,self.template_name,{
-            'blog_list' : self.blog_list,
+            'blog_list' : blog_list,
             'my_blog_list' : my_blog_list,
             'categories' : self.categories,
             })
@@ -35,9 +36,9 @@ class IndexView(TemplateView):
             login(self.request, user)
 
             my_blog_list = Blog.objects.filter(owner=self.request.user).order_by('-date_added')
-
+            blog_list = Blog.objects.all().order_by('-date_added')
             return render(self.request, self.template_name, { 
-                'blog_list' : self.blog_list,
+                'blog_list' : blog_list,
                 'my_blog_list' : my_blog_list,
                 'categories' : self.categories,
             })
