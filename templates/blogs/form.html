@@ -5,11 +5,11 @@
 <div class="card mb-12 my-4">
     <div class="card-header">
         {{ label }}
-        {{ errors }}
     </div> 
     <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
+            
             {{ form.title }}
             <small id="title-validation" class="text-danger">{{ form.title.errors.as_text }}</small>
             

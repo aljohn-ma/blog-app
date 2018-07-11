@@ -2,7 +2,6 @@
 {% block content%}
 <div class="col-md-8 my-4">
     <h1>Latest Blogs</h1>
-
     {% if blog_list %}
     {% for blog in blog_list %}
     <div class="card mb-4">
@@ -33,25 +32,16 @@
             REGISTER HERE
         </div>
         <div class="card-body">
-
             <form method="POST">
                 {% csrf_token %}
-                <label for="email"></label>
-                <input id="email" class="form-control" type="email" name="email" placeholder="Email">
-                <small id="email-validation" class="text-danger">{{ errors.email }}</small>
-
-                <label for="username"></label>
-                <input id="username" class="form-control" type="text" name="username" placeholder="Username">
-                <small id="username-validation" class="text-danger">{{ errors.username }}</small>
-
-                <label for="password"></label>
-                <input id="password" class="form-control" type="password" name="password" placeholder="Password">
-                <small id="password-validation" class="text-danger">{{ errors.password }}</small>
-
-                <label for="confirm-password"></label>
-                <input id="confirm_password" class="form-control" type="password" name="confirm_password" placeholder="Confirm password">
-                <small id="con-password-validation" class="text-danger">{{ errors.confirm_password }}</small>
-                
+                {{ form.email }}
+                <small id="email-validation" class="text-danger">{{ form.email.errors.as_text }}</small>
+                {{ form.username }}
+                <small id="username-validation" class="text-danger">{{ form.username.errors.as_text }}</small>
+                {{ form.password }}
+                <small id="password-validation" class="text-danger">{{ form.password.errors.as_text }}</small>
+                {{ form.confirm_password }}
+                <small id="con-password-validation" class="text-danger">{{ form.confrim_password.errors.as_text }}</small>
                 <button class="btn btn-default btn-primary btn-block my-3 " type="submit">Sign-up</button>
             </form>
         </div>

@@ -7,14 +7,12 @@ from django.shortcuts import get_object_or_404
 from .models import Blog,Category
 
 
-class UserRegistrationForm(forms.ModelForm):
+class UserRegistrationForm(forms.Form):
     """ User registration form """
-
-    confirm_password = forms.CharField()
-
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'password')
+    email = forms.EmailField(required=True, widget=forms.EmailInput(attrs={'class':'form-control','placeholder':'Email'}))
+    username = forms.CharField(required=True, widget=forms.TextInput(attrs={'class':'form-control mt-4','placeholder':'Username'}))
+    password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control mt-4','placeholder':'Password'}))
+    confirm_password = forms.CharField(required=True, widget=forms.PasswordInput(attrs={'class':'form-control mt-4','placeholder':'Password'}))
 
     def clean_confirm_password(self):
         """ Validate if password is equal to confir_password
@@ -30,21 +28,21 @@ class UserRegistrationForm(forms.ModelForm):
 
         if email and User.objects.filter(email=email).exists():
             raise forms.ValidationError('Email is already taken')
+
         return email
 
-    def save(self, commit=True):
-        """save user
-        """
-        instance = super(UserRegistrationForm, self).save(commit=False)
-        if commit:
-            
-            instance.set_password(self.cleaned_data.get('password'))
-            instance.save()
+    def save(self):
+        user = User()
+        user.username = self.cleaned_data.get('username')
+        user.email = self.cleaned_data.get('email')
+        user.set_password(self.cleaned_data.get('password'))
+        user.save()
+        return user
 
-        return instance
 
 class LoginForm(forms.ModelForm):
     """ Login view form. """
+
     username = forms.CharField(required=True)
     password = forms.CharField(required=True)
 
@@ -54,7 +52,6 @@ class LoginForm(forms.ModelForm):
 
     def clean(self):
         current_user = None
-
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
 

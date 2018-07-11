@@ -17,6 +17,7 @@ class IndexView(TemplateView):
     categories = Category.objects.all()
 
     def get(self, *args, **kwargs):
+        form = UserRegistrationForm(self.request.GET or None)
         my_blog_list = {}
         blog_list = Blog.objects.all().order_by('-date_added')
         if self.request.user.is_authenticated:
@@ -25,18 +26,20 @@ class IndexView(TemplateView):
         return render(self.request,self.template_name,{
             'blog_list' : blog_list,
             'my_blog_list' : my_blog_list,
+            'form' : form,
             'categories' : self.categories,
-            })
+        })
 
     def post(self, *args, **kwargs):
         form = UserRegistrationForm(self.request.POST)
+        blog_list = Blog.objects.all().order_by('-date_added')
         if form.is_valid():
             user = form.save()
             user = authenticate(username = form.cleaned_data.get('username'), password=form.cleaned_data.get('password'))
             login(self.request, user)
 
             my_blog_list = Blog.objects.filter(owner=self.request.user).order_by('-date_added')
-            blog_list = Blog.objects.all().order_by('-date_added')
+            
             return render(self.request, self.template_name, { 
                 'blog_list' : blog_list,
                 'my_blog_list' : my_blog_list,
@@ -44,10 +47,7 @@ class IndexView(TemplateView):
             })
 
         else:
-            errors= {}            
-            for error in form.errors:
-                errors[error] = form.errors[error]
-            return render(self.request,self.template_name,{ 'errors' : errors })
+            return render(self.request,self.template_name,{ 'blog_list': blog_list, 'form' : form })
 
 
 class LoginView(TemplateView):
@@ -147,7 +147,7 @@ class BlogView(TemplateView):
 
     def get(self,*args, **kwargs):
         categories = Category.objects.all().order_by('name')
-        blog = get_object_or_404(Blog,pk=self.kwargs.get('pk'),owner = self.request.user)
+        blog = get_object_or_404(Blog,pk=self.kwargs.get('pk'))
         return render(self.request,self.template_name,{
             'categories' : categories,
             'blog_info' : blog
